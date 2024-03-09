@@ -6,10 +6,7 @@ import json
 from urllib.parse import quote
 import requests
 import numpy as np
-import tracemalloc
 
-# Start tracing memory allocations
-tracemalloc.start()
 
 @st.cache_resource()
 def load_model():
@@ -102,7 +99,7 @@ def main():
 
     # Choose a single random movie title using numpy's random.choice
     random_movie_title = np.random.choice(all_movie_titles, size=1, replace=False)[0]
-    # print(random_movie_title)
+    print(random_movie_title)
     # Get movie details using your function (replace GetMovieFromName with your actual function)
     random_movie_detail = GetMovieFromName(random_movie_title)
 
@@ -116,9 +113,11 @@ def main():
         with col7:
             # Display the random movie title
             Title = random_movie_detail['Title']
-            st.markdown(f'<div style="font-weight: bold; font-size: 30px ;">Title:&nbsp;{Title}</div><br>',unsafe_allow_html=True)
+            st.markdown(f'<div style="font-weight: bold; font-size: 30px;">Title:&nbsp;{Title}</div><br>',
+                        unsafe_allow_html=True)
             Release_year = random_movie_detail['Year']
-            st.markdown(f'<div style="font-weight: bold;">Release year:&nbsp;{Release_year}</div><br>', unsafe_allow_html=True)
+            st.markdown(f'<div style="font-weight: bold;">Release year:&nbsp;{Release_year}</div><br>',
+                        unsafe_allow_html=True)
             imdbID = random_movie_detail['imdbID']
             st.markdown(f'<div style="font-weight: bold;">IMDB id:&nbsp;{imdbID}</div><br>', unsafe_allow_html=True)
 
@@ -197,12 +196,3 @@ def main():
                          unsafe_allow_html=True)
         else:
             continue
-
-current_memory = tracemalloc.get_traced_memory()
-print("Current memory:", current_memory)
-
-# Stop tracing memory allocations
-tracemalloc.stop()
-
-if __name__ == "__main__":
-    main()
