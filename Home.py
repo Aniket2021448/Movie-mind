@@ -39,7 +39,9 @@ def GetMovieFromID(id):
 
 
 def GetMovieFromName(movie_name):
-    myAPI_key = "apikey 7hSbLbqnMVnRvRsttatgRx:1HxgNB8iJnU9eWI5FHMjp1"
+    print("Movie name in getMovieFromName: ", movie_name)
+    # API key for the collectapi.com
+    myAPI_key = "apikey 4TpzMkeibWYoLfCtFlnwKI:3mSnUaq2ZbUc7JicmqQ8W1"
 
     conn = http.client.HTTPSConnection("api.collectapi.com")
 
@@ -56,7 +58,7 @@ def GetMovieFromName(movie_name):
     decoded_data = data.decode("utf-8")
 
     json_data = json.loads(decoded_data)
-
+    print("Movie json data in getMovieFromName: ", json_data)
     if 'result' in json_data:
         movies = json_data['result']
 
@@ -91,7 +93,7 @@ def main():
 
     # Choose a single random movie title using numpy's random.choice
     random_movie_title = np.random.choice(all_movie_titles, size=1, replace=False)[0]
-    # print(random_movie_title)
+    print(random_movie_title)
     # Get movie details using your function (replace GetMovieFromName with your actual function)
     random_movie_detail = GetMovieFromName(random_movie_title)
 
