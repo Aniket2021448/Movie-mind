@@ -36,9 +36,9 @@ st.balloons()
 
 # Web content starts
 # Navbar starts
-col9, col10 = st.columns([1, 20])
+col9, col10 = st.columns([2, 20])
 col9.image(image='popcorn.png', width=100)
-col10.header("        Movie mind")
+col10.header("Movie mind")
 
 selected = option_menu(
     menu_title="",
