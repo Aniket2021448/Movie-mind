@@ -1,5 +1,5 @@
 import streamlit as st
-st.set_page_config(layout="wide", page_title="Movie mind", page_icon="popcorn")
+st.set_page_config(layout="wide", page_title="Movie mind", page_icon=":popcorn:")
 from streamlit_option_menu import option_menu
 import time
 import About, Home, Contact
@@ -37,7 +37,7 @@ st.balloons()
 # Web content starts
 # Navbar starts
 col9, col10 = st.columns([1, 10])
-col9.image('popcorn.png')
+col9.image(image='popcorn.png')
 col10.write('Movie mind')
 
 selected = option_menu(
