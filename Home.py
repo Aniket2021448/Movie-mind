@@ -7,21 +7,27 @@ from urllib.parse import quote
 import requests
 import numpy as np
 
-similarities = []
-for i in range(15): #D:\PROJECTS\Movie-recommender-system\streamlitWebApp\similarity_chunk_1.pkl
-    filename = f"similarity_chunk_{i+1}.pkl"
-# streamlitWebApp\similarity_chunk_1.pkl
-    with open(filename, 'rb') as f:
-        chunk_data = pickle.load(f)
-        similarities.append(chunk_data)
 
-# Concatenate all chunks into a single similarity matrix
-similarity = np.concatenate(similarities, axis=0)
+@st.cache_resource()
+def load_model():
+    similarities = []
+    for i in range(15): #D:\PROJECTS\Movie-recommender-system\streamlitWebApp\similarity_chunk_1.pkl
+        filename = f"similarity_chunk_{i+1}.pkl"
+    # streamlitWebApp\similarity_chunk_1.pkl
+        with open(filename, 'rb') as f:
+            chunk_data = pickle.load(f)
+            similarities.append(chunk_data)
+
+    # Concatenate all chunks into a single similarity matrix
+    similarity = np.concatenate(similarities, axis=0)
+
+    return similarity
 
 
+similarity = load_model()
 movies_list = pickle.load(open('movies.pkl', 'rb'))  # Keep the original DataFrame
 
-
+@st.cache_data()
 def GetMovieFromID(id):
     url = f"https://api.themoviedb.org/3/movie/{id}?language=en-US"
 
@@ -37,7 +43,7 @@ def GetMovieFromID(id):
     else:
         return None
 
-
+@st.cache_data()
 def GetMovieFromName(movie_name):
     print("Movie name in getMovieFromName: ", movie_name)
     # API key for the collectapi.com
@@ -65,7 +71,7 @@ def GetMovieFromName(movie_name):
         if movies:
             return movies[0]
 
-
+@st.cache_data()
 def recommend(movie):
     movie_index = movies_list[movies_list['title'] == movie].index[0]
     distances = similarity[movie_index]

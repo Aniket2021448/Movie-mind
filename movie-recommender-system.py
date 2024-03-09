@@ -8,29 +8,14 @@ st.set_page_config(layout="wide")
 
 
 def render_About_page():
-    # Load and run the Projects page script from the pages folder 
-    # spec = importlib.util.spec_from_file_location("About", "About.py")
-    # module = importlib.util.module_from_spec(spec)
-    # spec.loader.exec_module(module)
-    # Call the main function from the Projects page script
     About.main()
 
 
 def render_home_page():
-
-    # spec = importlib.util.spec_from_file_location("Home", "Home.py")
-    # module = importlib.util.module_from_spec(spec)
-    # spec.loader.exec_module(module)
-    # Call the main function from the Projects page script
     Home.main()
 
 
 def render_contact_page():
-    # Load and run the Projects page script from the pages folder
-    # spec = importlib.util.spec_from_file_location("Contact", "Contact.py")
-    # module = importlib.util.module_from_spec(spec)
-    # spec.loader.exec_module(module)
-    # Call the main function from the Projects page script
     Contact.main()
 
 
@@ -53,11 +38,15 @@ st.balloons()
 
 # Web content starts
 # Navbar starts
+col9, col10 = st.columns([1, 10])
+col9.image('popcon.png')
+col10.write('Movie mind')
+
 selected = option_menu(
-    menu_title="Movie minds",
+    menu_title="",
     options=["Home", "About", "Contact"],
     icons=['house', 'kanban', 'envelope'],
-    menu_icon="cast",
+    menu_icon="",
     default_index=0,
     orientation="horizontal",
     styles="height: {300px;}, padding: {0px;}, margin: {0px;}, background-color: {white;}"
