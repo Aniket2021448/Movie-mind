@@ -6,7 +6,10 @@ import json
 from urllib.parse import quote
 import requests
 import numpy as np
+import tracemalloc
 
+# Start tracing memory allocations
+tracemalloc.start()
 
 @st.cache_resource()
 def load_model():
@@ -45,7 +48,7 @@ def GetMovieFromID(id):
 
 @st.cache_data()
 def GetMovieFromName(movie_name):
-    print("Movie name in getMovieFromName: ", movie_name)
+    # print("Movie name in getMovieFromName: ", movie_name)
     # API key for the collectapi.com
     myAPI_key = "apikey 4TpzMkeibWYoLfCtFlnwKI:3mSnUaq2ZbUc7JicmqQ8W1"
 
@@ -64,7 +67,7 @@ def GetMovieFromName(movie_name):
     decoded_data = data.decode("utf-8")
 
     json_data = json.loads(decoded_data)
-    print("Movie json data in getMovieFromName: ", json_data)
+    # print("Movie json data in getMovieFromName: ", json_data)
     if 'result' in json_data:
         movies = json_data['result']
 
@@ -89,7 +92,7 @@ def recommend(movie):
 
 
 def main():
-    st.subheader("WATCH NOW")
+    st.subheader(":movie_camera: WATCH NOW")
     # A random movie extracted from the dataset
     # and its details and posters fetched from imdb website using the imdb API
 
@@ -99,7 +102,7 @@ def main():
 
     # Choose a single random movie title using numpy's random.choice
     random_movie_title = np.random.choice(all_movie_titles, size=1, replace=False)[0]
-    print(random_movie_title)
+    # print(random_movie_title)
     # Get movie details using your function (replace GetMovieFromName with your actual function)
     random_movie_detail = GetMovieFromName(random_movie_title)
 
@@ -113,15 +116,11 @@ def main():
         with col7:
             # Display the random movie title
             Title = random_movie_detail['Title']
-            st.markdown(f'<div style="font-weight: bold; font-size: 30px;">Title:&nbsp;{Title}</div><br>',
-                        unsafe_allow_html=True)
+            st.markdown(f'<div style="font-weight: bold; font-size: 30px ;">Title:&nbsp;{Title}</div><br>',unsafe_allow_html=True)
             Release_year = random_movie_detail['Year']
-            st.markdown(f'<div style="font-weight: bold;">Release year:&nbsp;{Release_year}</div><br>',
-                        unsafe_allow_html=True)
+            st.markdown(f'<div style="font-weight: bold;">Release year:&nbsp;{Release_year}</div><br>', unsafe_allow_html=True)
             imdbID = random_movie_detail['imdbID']
             st.markdown(f'<div style="font-weight: bold;">IMDB id:&nbsp;{imdbID}</div><br>', unsafe_allow_html=True)
-            overview = (allDetails['overview'] if 'overview' in allDetails else '')
-            st.markdown(f'<div style="font-weight: bold;">Overview:&nbsp;{overview}</div><br>', unsafe_allow_html=True)
 
             # Check if 'genres' key exists in allDetails
             if 'genres' in allDetails:
@@ -130,50 +129,60 @@ def main():
                 st.markdown(f'<div style="font-weight: bold;">Genres:&nbsp;{genre}</div>', unsafe_allow_html=True)
             else:
                 st.markdown(f'<div style="font-weight: bold;">Genres:&nbsp;N/A</div>', unsafe_allow_html=True)
-        # with col8:
-        #     st.text("")
+                
+            overview = (allDetails['overview'] if 'overview' in allDetails else '')
+            st.markdown('<div style="font-weight: bold; font-size: 20px;">Overview:</div>', unsafe_allow_html=True)
+            st.write('')  # Add some space
+            st.markdown(f'<div style="word-wrap: break-word; max-width: 800px;">{overview}</div>', unsafe_allow_html=True)
+
+
 
     else:
         st.warning("Movie details not available.")
 
-    # Movie Recommender System
-    st.title('Movie Recommender system')
-    selected_movie_name = st.selectbox('SEARCH YOUR MOVIE', movies_list['title'].values, key="search_movie")
+    st.write('---')  # Add a horizontal line for separation
+    st.write('')  # Add some space
 
-    if st.button('Search'):
+    # Movie Recommender System
+    form = st.form(key='my_form')
+    form.title(':robot_face: Movie Recommender system')
+    selected_movie_name = form.selectbox('SEARCH YOUR MOVIE', movies_list['title'].values, key="search_movie")
+
+    if form.form_submit_button('Search'):
         poster, recommendations = recommend(selected_movie_name)
 
         col1, col2, col3, col4, col5 = st.columns(5)
 
         if len(recommendations) >= 1:
             with col1:
-                st.text(recommendations[0])
-                st.markdown(f'<img src="{poster[0]}" style="height:300px; width:200px;">', unsafe_allow_html=True)
+                form.text(recommendations[0])
+                form.markdown(f'<img src="{poster[0]}" style="height:300px; width:200px;">', unsafe_allow_html=True)
 
         if len(recommendations) >= 2:
             with col2:
-                st.text(recommendations[1])
-                st.markdown(f'<img src="{poster[1]}" style="height:300px; width:200px;">', unsafe_allow_html=True)
+                form.text(recommendations[1])
+                form.markdown(f'<img src="{poster[1]}" style="height:300px; width:200px;">', unsafe_allow_html=True)
 
         if len(recommendations) >= 3:
             with col3:
-                st.text(recommendations[2])
-                st.markdown(f'<img src="{poster[2]}" style="height:300px; width:200px;">', unsafe_allow_html=True)
+                form.text(recommendations[2])
+                form.markdown(f'<img src="{poster[2]}" style="height:300px; width:200px;">', unsafe_allow_html=True)
 
         if len(recommendations) >= 4:
             with col4:
-                st.text(recommendations[3])
-                st.markdown(f'<img src="{poster[3]}" style="height:300px; width:200px;">', unsafe_allow_html=True)
+                form.text(recommendations[3])
+                form.markdown(f'<img src="{poster[3]}" style="height:300px; width:200px;">', unsafe_allow_html=True)
 
         if len(recommendations) >= 5:
             with col5:
-                st.text(recommendations[4])
-                st.markdown(f'<img src="{poster[4]}" style="height:300px; width:200px;">', unsafe_allow_html=True)
+                form.text(recommendations[4])
+                form.markdown(f'<img src="{poster[4]}" style="height:300px; width:200px;">', unsafe_allow_html=True)
 
     # st.markdown("""<br><br>""")
-    st.text("")
+    st.write("---")
+    st.write("")
     # Displaying other movies
-    st.subheader("\n\nAll time favourites")
+    st.subheader("\n:film_projector: All time favourites")
     random_movie_title2 = np.random.choice(all_movie_titles, size=5, replace=False)
     other_movie_details = [GetMovieFromName(title) for title in random_movie_title2]
 
@@ -188,3 +197,12 @@ def main():
                          unsafe_allow_html=True)
         else:
             continue
+
+current_memory = tracemalloc.get_traced_memory()
+print("Current memory:", current_memory)
+
+# Stop tracing memory allocations
+tracemalloc.stop()
+
+if __name__ == "__main__":
+    main()
