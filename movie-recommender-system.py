@@ -1,10 +1,8 @@
-import time
-from streamlit_option_menu import option_menu
 import streamlit as st
-import importlib.util
+st.set_page_config(layout="wide", page_title="Movie mind", page_icon="popcorn")
+from streamlit_option_menu import option_menu
+import time
 import About, Home, Contact
-
-st.set_page_config(layout="wide")
 
 
 def render_About_page():
