@@ -9,7 +9,7 @@ import numpy as np
 
 similarities = []
 for i in range(15): #D:\PROJECTS\Movie-recommender-system\streamlitWebApp\similarity_chunk_1.pkl
-    filename = f"streamlitWebApp\similarity_chunk_{i+1}.pkl"
+    filename = f"similarity_chunk_{i+1}.pkl"
 # streamlitWebApp\similarity_chunk_1.pkl
     with open(filename, 'rb') as f:
         chunk_data = pickle.load(f)
