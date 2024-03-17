@@ -32,9 +32,9 @@ def GetMovieFromID(id):
     url = f"https://api.themoviedb.org/3/movie/{id}?language=en-US"
 
     headers = {
-        "accept": "application/json",
-        "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiMDg0YjA1ZDhhMzM1MTJjYWQwYTI3ZDM1MmZiYTljNCIsInN1YiI6IjY1YmY2ODRjYTM1YzhlMDE2M2Q1NTk5OCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.obJ65ZxM_vuIPmjQPZQ4j8bkJSLF4qKQEzdK3VV80ng"
-    }
+        'content-type': "application/json",
+        'authorization': "apikey 7dcViFpefKrzdGHGIvDrZI:6booZs3hpzPLGwkVct07yF"
+        }
 
     response = requests.get(url, headers=headers)
 
