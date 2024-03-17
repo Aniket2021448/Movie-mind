@@ -131,7 +131,11 @@ def main():
                 st.markdown(f'<div style="font-weight: bold;">Genres:&nbsp;N/A</div>', unsafe_allow_html=True)
 
                 
-            overview = (allDetails['overview'] if 'overview' in allDetails else '')
+            if allDetails is not None:
+                overview = allDetails.get('overview', '')
+            else:
+                overview = ''
+
             st.markdown('<div style="font-weight: bold; font-size: 20px;">Overview:</div>', unsafe_allow_html=True)
             st.write('')  # Add some space
             st.markdown(f'<div style="word-wrap: break-word; max-width: 800px;">{overview}</div>', unsafe_allow_html=True)
