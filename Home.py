@@ -133,10 +133,14 @@ def main():
     # Proceed with accessing allDetails and its keys
                 if 'overview' in allDetails:
                     overview = allDetails['overview']
+                    
                 else:
                     overview = ''
             else:
                 overview = ''
+            
+            st.markdown(f'<div style="font-weight: bold;">Overview:&nbsp;{overview}</div>', unsafe_allow_html=True)
+            
 
 
     else:
