@@ -43,6 +43,7 @@ def GetMovieFromID(id):
     else:
         return None
 
+
 @st.cache_data()
 def GetMovieFromName(movie_name):
     # print("Movie name in getMovieFromName: ", movie_name)
@@ -122,12 +123,13 @@ def main():
             st.markdown(f'<div style="font-weight: bold;">IMDB id:&nbsp;{imdbID}</div><br>', unsafe_allow_html=True)
 
             # Check if 'genres' key exists in allDetails
-            if 'genres' in allDetails:
+            if allDetails is not None and 'genres' in allDetails:
                 genre_names = [genre['name'] for genre in allDetails['genres']]
                 genre = ", ".join(genre_names)
                 st.markdown(f'<div style="font-weight: bold;">Genres:&nbsp;{genre}</div>', unsafe_allow_html=True)
             else:
                 st.markdown(f'<div style="font-weight: bold;">Genres:&nbsp;N/A</div>', unsafe_allow_html=True)
+
                 
             overview = (allDetails['overview'] if 'overview' in allDetails else '')
             st.markdown('<div style="font-weight: bold; font-size: 20px;">Overview:</div>', unsafe_allow_html=True)
