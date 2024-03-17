@@ -32,9 +32,9 @@ def GetMovieFromID(id):
     url = f"https://api.themoviedb.org/3/movie/{id}?language=en-US"
 
     headers = {
-        'content-type': "application/json",
-        'authorization': "apikey 7dcViFpefKrzdGHGIvDrZI:6booZs3hpzPLGwkVct07yF"
-        }
+        "accept": "application/json",
+        "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiMDg0YjA1ZDhhMzM1MTJjYWQwYTI3ZDM1MmZiYTljNCIsInN1YiI6IjY1YmY2ODRjYTM1YzhlMDE2M2Q1NTk5OCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.obJ65ZxM_vuIPmjQPZQ4j8bkJSLF4qKQEzdK3VV80ng"
+    }
 
     response = requests.get(url, headers=headers)
 
@@ -42,7 +42,6 @@ def GetMovieFromID(id):
         return response.json()
     else:
         return None
-
 
 @st.cache_data()
 def GetMovieFromName(movie_name):
@@ -123,19 +122,14 @@ def main():
             st.markdown(f'<div style="font-weight: bold;">IMDB id:&nbsp;{imdbID}</div><br>', unsafe_allow_html=True)
 
             # Check if 'genres' key exists in allDetails
-            if allDetails is not None and 'genres' in allDetails:
+            if 'genres' in allDetails:
                 genre_names = [genre['name'] for genre in allDetails['genres']]
                 genre = ", ".join(genre_names)
                 st.markdown(f'<div style="font-weight: bold;">Genres:&nbsp;{genre}</div>', unsafe_allow_html=True)
             else:
                 st.markdown(f'<div style="font-weight: bold;">Genres:&nbsp;N/A</div>', unsafe_allow_html=True)
-
                 
-            if allDetails is not None:
-                overview = allDetails.get('overview', '')
-            else:
-                overview = ''
-
+            overview = (allDetails['overview'] if 'overview' in allDetails else '')
             st.markdown('<div style="font-weight: bold; font-size: 20px;">Overview:</div>', unsafe_allow_html=True)
             st.write('')  # Add some space
             st.markdown(f'<div style="word-wrap: break-word; max-width: 800px;">{overview}</div>', unsafe_allow_html=True)
