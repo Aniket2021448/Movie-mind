@@ -47,7 +47,7 @@ def GetMovieFromID(id):
 def GetMovieFromName(movie_name):
     # print("Movie name in getMovieFromName: ", movie_name)
     # API key for the collectapi.com
-    myAPI_key = "apikey 4TpzMkeibWYoLfCtFlnwKI:3mSnUaq2ZbUc7JicmqQ8W1"
+    myAPI_key = "apikey 7dcViFpefKrzdGHGIvDrZI:6booZs3hpzPLGwkVct07yF"
 
     conn = http.client.HTTPSConnection("api.collectapi.com")
 
