@@ -1,12 +1,13 @@
 from streamlit_option_menu import option_menu
 import streamlit as st
 import pickle
-import http.client
-import json
 from urllib.parse import quote
 import requests
 import numpy as np
 
+import tracemalloc
+tracemalloc.start()
+# ,m,
 
 @st.cache_resource()
 def load_model():
@@ -27,51 +28,80 @@ def load_model():
 similarity = load_model()
 movies_list = pickle.load(open('movies.pkl', 'rb'))  # Keep the original DataFrame
 
-@st.cache_data()
-def GetMovieFromID(id):
-    url = f"https://api.themoviedb.org/3/movie/{id}?language=en-US"
 
-    headers = {
-        "accept": "application/json",
-        "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiMDg0YjA1ZDhhMzM1MTJjYWQwYTI3ZDM1MmZiYTljNCIsInN1YiI6IjY1YmY2ODRjYTM1YzhlMDE2M2Q1NTk5OCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.obJ65ZxM_vuIPmjQPZQ4j8bkJSLF4qKQEzdK3VV80ng"
+api_key = 'b084b05d8a33512cad0a27d352fba9c4'
+
+def get_movie_detailsFromName(movie_name):
+    # Base URL for TMDb API
+    base_url = "https://api.themoviedb.org/3"
+
+    # Endpoint for searching movies by name
+    search_endpoint = "/search/movie"
+
+    # Parameters for the request
+    params = {
+        'api_key': api_key,
+        'query': movie_name
     }
 
-    response = requests.get(url, headers=headers)
+    # Send GET request to search for the movie
+    response = requests.get(base_url + search_endpoint, params=params)
 
-    if response.ok:
-        return response.json()
+    # Check if the request was successful
+    if response.status_code == 200:
+        # Parse JSON response
+        data = response.json()
+
+        # Check if there are any results
+        if data['total_results'] > 0:
+            # Get details of the first movie in the results
+            movie_details = data['results'][0]
+            return movie_details
+        else:
+            return "No movie found with that name."
     else:
-        return None
+        return "Error: Unable to retrieve data."
 
-@st.cache_data()
-def GetMovieFromName(movie_name):
-    # print("Movie name in getMovieFromName: ", movie_name)
-    # API key for the collectapi.com
-    myAPI_key = "apikey 7dcViFpefKrzdGHGIvDrZI:6booZs3hpzPLGwkVct07yF"
 
-    conn = http.client.HTTPSConnection("api.collectapi.com")
 
-    headers = {
-        'content-type': "application/json",
-        'authorization': myAPI_key
+
+
+def getGenreNames(movie_genre_ids):
+
+    # Define the base URL for TMDb API
+    base_url = "https://api.themoviedb.org/3"
+
+    # Endpoint for retrieving genre list
+    genre_endpoint = "/genre/movie/list"
+
+    # Parameters for the request
+    params = {
+    'api_key': api_key  # Replace 'YOUR_API_KEY' with your actual TMDb API key
     }
 
-    encoded_movie_name = quote(movie_name)
-    conn.request("GET", f"/imdb/imdbSearchByName?query={encoded_movie_name}", headers=headers)
+    # Send GET request to retrieve genre list
+    response = requests.get(base_url + genre_endpoint, params=params)
 
-    res = conn.getresponse()    
-    data = res.read()
-    decoded_data = data.decode("utf-8")
+    # Check if the request was successful
+    if response.status_code == 200:
+    # Parse JSON response
+        data = response.json()
 
-    json_data = json.loads(decoded_data)
-    # print("Movie json data in getMovieFromName: ", json_data)
-    if 'result' in json_data:
-        movies = json_data['result']
+        # Extract genre names from genre IDs
+        genre_names = {genre['id']: genre['name'] for genre in data['genres']}
 
-        if movies:
-            return movies[0]
+        # Extract genre names for the given movie's genre IDs
+        # movie_genre_ids = [28, 878]  # Example genre IDs from the provided data
+        movie_genre_names = [genre_names[genre_id] for genre_id in movie_genre_ids]
 
-@st.cache_data()
+        return ", ".join(movie_genre_names)
+         
+    else:
+        return "Error: Unable to retrieve genre list."
+        
+
+
+
 def recommend(movie):
     movie_index = movies_list[movies_list['title'] == movie].index[0]
     distances = similarity[movie_index]
@@ -80,9 +110,9 @@ def recommend(movie):
     posters = []
 
     for j in fetched_movies[1:6]:
-        movieDataFetched = GetMovieFromName(movies_list.iloc[j[0]].title)
-        if movieDataFetched and 'Poster' in movieDataFetched:
-            posters.append(movieDataFetched['Poster'])
+        movieDataFetched = get_movie_detailsFromName(movies_list.iloc[j[0]].title)
+        if movieDataFetched and 'poster_path' in movieDataFetched:
+            posters.append("https://image.tmdb.org/t/p/w500"+movieDataFetched['poster_path'])
             recommend_movies.append(movies_list.iloc[j[0]].title)
 
     return posters, recommend_movies
@@ -100,47 +130,36 @@ def main():
     # Choose a single random movie title using numpy's random.choice
     random_movie_title = np.random.choice(all_movie_titles, size=1, replace=False)[0]
     print(random_movie_title)
-    # Get movie details using your function (replace GetMovieFromName with your actual function)
-    random_movie_detail = GetMovieFromName(random_movie_title)
+    # Get movie details using your function (replace get_movie_detailsFromName with your actual function)
+    random_movie_detail = get_movie_detailsFromName(random_movie_title)
 
-    if random_movie_detail and 'imdbID' in random_movie_detail:
-        allDetails = GetMovieFromID(random_movie_detail['imdbID'])
+    if random_movie_detail and 'id' in random_movie_detail:
+        
 
         with col6:
             # Display the poster image
-            st.image(random_movie_detail['Poster'])
+            st.image("https://image.tmdb.org/t/p/w500"+random_movie_detail['poster_path'])
 
         with col7:
             # Display the random movie title
-            Title = random_movie_detail['Title']
-            st.markdown(f'<div style="font-weight: bold; font-size: 30px;">Title:&nbsp;{Title}</div><br>',
-                        unsafe_allow_html=True)
-            Release_year = random_movie_detail['Year']
-            st.markdown(f'<div style="font-weight: bold;">Release year:&nbsp;{Release_year}</div><br>',
-                        unsafe_allow_html=True)
-            imdbID = random_movie_detail['imdbID']
-            st.markdown(f'<div style="font-weight: bold;">IMDB id:&nbsp;{imdbID}</div><br>', unsafe_allow_html=True)
+            Title = random_movie_detail['title']
+            st.markdown(f'<div style="font-weight: bold; font-size: 30px;">Title:&nbsp;{Title}</div><br>',unsafe_allow_html=True)
+            
+            Movie_genre = getGenreNames(random_movie_detail['genre_ids'])
+            st.markdown(f'<div style="font-weight: bold;">Genres:&nbsp;{Movie_genre}</div>', unsafe_allow_html=True)
 
-            # Check if 'genres' key exists in allDetails
-            if 'genres' in allDetails:
-                genre_names = [genre['name'] for genre in allDetails['genres']]
-                genre = ", ".join(genre_names)
-                st.markdown(f'<div style="font-weight: bold;">Genres:&nbsp;{genre}</div>', unsafe_allow_html=True)
-            else:
-                st.markdown(f'<div style="font-weight: bold;">Genres:&nbsp;N/A</div>', unsafe_allow_html=True)
-                
-            if allDetails is not None:
-    # Proceed with accessing allDetails and its keys
-                if 'overview' in allDetails:
-                    overview = allDetails['overview']
-                    
-                else:
-                    overview = ''
-            else:
-                overview = ''
+            popularity = random_movie_detail['popularity']
+            st.markdown(f'<div style="font-weight: bold;">Popularity:&nbsp;{popularity}</div>', unsafe_allow_html=True)
+           
+            rating = random_movie_detail['vote_average']
+            st.markdown(f'<div style="font-weight: bold;">Rating:&nbsp;{rating}</div>', unsafe_allow_html=True)
             
+            Release_date = random_movie_detail['release_date']
+            st.markdown(f'<div style="font-weight: bold;">Release year:&nbsp;{Release_date}</div><br>',unsafe_allow_html=True)
+            
+            overview = random_movie_detail['overview']
             st.markdown(f'<div style="font-weight: bold;">Overview:&nbsp;{overview}</div>', unsafe_allow_html=True)
-            
+
 
 
     else:
@@ -157,32 +176,13 @@ def main():
     if form.form_submit_button('Search'):
         poster, recommendations = recommend(selected_movie_name)
 
-        col1, col2, col3, col4, col5 = st.columns(5)
+    # Create a single column to contain all recommendations
+        col_recommendations = st.columns(len(recommendations))
 
-        if len(recommendations) >= 1:
-            with col1:
-                form.text(recommendations[0])
-                form.markdown(f'<img src="{poster[0]}" style="height:300px; width:200px;">', unsafe_allow_html=True)
-
-        if len(recommendations) >= 2:
-            with col2:
-                form.text(recommendations[1])
-                form.markdown(f'<img src="{poster[1]}" style="height:300px; width:200px;">', unsafe_allow_html=True)
-
-        if len(recommendations) >= 3:
-            with col3:
-                form.text(recommendations[2])
-                form.markdown(f'<img src="{poster[2]}" style="height:300px; width:200px;">', unsafe_allow_html=True)
-
-        if len(recommendations) >= 4:
-            with col4:
-                form.text(recommendations[3])
-                form.markdown(f'<img src="{poster[3]}" style="height:300px; width:200px;">', unsafe_allow_html=True)
-
-        if len(recommendations) >= 5:
-            with col5:
-                form.text(recommendations[4])
-                form.markdown(f'<img src="{poster[4]}" style="height:300px; width:200px;">', unsafe_allow_html=True)
+        for i in range(len(recommendations)):
+            with col_recommendations[i]:
+                st.text(recommendations[i])
+                st.markdown(f'<img src="{poster[i]}" style="height:300px; width:200px;">', unsafe_allow_html=True)
 
     # st.markdown("""<br><br>""")
     st.write("---")
@@ -190,16 +190,16 @@ def main():
     # Displaying other movies
     st.subheader("\n:film_projector: All time favourites")
     random_movie_title2 = np.random.choice(all_movie_titles, size=5, replace=False)
-    other_movie_details = [GetMovieFromName(title) for title in random_movie_title2]
+    other_movie_details = [get_movie_detailsFromName(title) for title in random_movie_title2]
 
     col_movies = st.columns(5)
 
     for i in range(5):
         col = col_movies[i]
-        if other_movie_details[i] and 'Poster' in other_movie_details[i]:
+        if other_movie_details[i] and 'poster_path' in other_movie_details[i]:
             col.text(random_movie_title2[i])
             # Adjust height and width of the poster image
-            col.markdown(f'<img src="{other_movie_details[i]["Poster"]}" style="height:300px; width:200px;">',
+            col.markdown(f'<img src="{"https://image.tmdb.org/t/p/w500"+other_movie_details[i]["poster_path"]}" style="height:300px; width:200px;">',
                          unsafe_allow_html=True)
         else:
             continue

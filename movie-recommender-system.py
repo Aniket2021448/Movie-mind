@@ -2,6 +2,7 @@ import streamlit as st
 st.set_page_config(layout="wide", page_title="Movie mind", page_icon=":popcorn:")
 from streamlit_option_menu import option_menu
 import time
+import asyncio
 import About, Home, Contact
 
 
@@ -57,4 +58,3 @@ elif selected == "Contact":
 else:
     render_home_page()
 
-# Navbar ends
