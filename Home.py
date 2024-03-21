@@ -129,7 +129,7 @@ def main():
 
     # Choose a single random movie title using numpy's random.choice
     random_movie_title = np.random.choice(all_movie_titles, size=1, replace=False)[0]
-    print(random_movie_title)
+    # print(random_movie_title)
     # Get movie details using your function (replace get_movie_detailsFromName with your actual function)
     random_movie_detail = get_movie_detailsFromName(random_movie_title)
 
