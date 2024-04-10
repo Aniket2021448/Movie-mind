@@ -208,7 +208,7 @@ def main():
     st.write("---")
     st.write("")
     with st.form("app_selection_form"):
-        st.write("Feel free to explore my other apps")
+        st.write("Feel free to explore my other apps :eyes:")
         app_links = {
             "find-the-fake": "https://find-fake-news.streamlit.app/",
             "Comment-Feel": "https://huggingface.co/spaces/GoodML/Comment-Feel"
