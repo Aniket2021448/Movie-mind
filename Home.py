@@ -205,7 +205,8 @@ def main():
             continue
 
     
-    
+    st.write("---")
+    st.write("")
     with st.form("app_selection_form"):
         st.write("Feel free to explore my other apps")
         app_links = {
